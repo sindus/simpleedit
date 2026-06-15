@@ -1,0 +1,102 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+env:
+  CARGO_TERM_COLOR: always
+  BINARY_NAME: tincta
+
+jobs:
+  build-macos:
+    name: Build macOS (${{ matrix.target }})
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-apple-darwin
+          - aarch64-apple-darwin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-${{ matrix.target }}-release-${{ hashFiles('**/Cargo.lock') }}
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+      - name: Package
+        run: |
+          cd target/${{ matrix.target }}/release
+          tar czf tincta-${{ github.ref_name }}-${{ matrix.target }}.tar.gz ${{ env.BINARY_NAME }}
+          mv tincta-*.tar.gz ${{ github.workspace }}/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tincta-${{ matrix.target }}
+          path: tincta-*.tar.gz
+
+  build-linux:
+    name: Build Linux (x86_64)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: linux-x86_64-release-${{ hashFiles('**/Cargo.lock') }}
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libxkbcommon-dev libvulkan-dev
+      - name: Build binary
+        run: cargo build --release
+      - name: Package tarball
+        run: |
+          cd target/release
+          tar czf tincta-${{ github.ref_name }}-x86_64-linux.tar.gz ${{ env.BINARY_NAME }}
+          mv tincta-*.tar.gz ${{ github.workspace }}/
+      - name: Build DEB
+        run: |
+          cargo install cargo-deb
+          cargo deb
+          cp target/debian/*.deb ${{ github.workspace }}/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tincta-linux
+          path: |
+            tincta-*.tar.gz
+            *.deb
+
+  release:
+    name: Create GitHub Release
+    needs: [build-macos, build-linux]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            tincta-*.tar.gz
+            *.deb
+          generate_release_notes: true
+          draft: false
