@@ -1,5 +1,5 @@
 name: tincta
-version: '0.5.0'
+version: '0.5.1'
 summary: A fast, stable, cross-platform text editor
 description: |
   Tincta is a fast, stable text editor with syntax highlighting for 60+
@@ -7,7 +7,7 @@ description: |
   (English and French). Compatible with Ubuntu, Debian, and other Linux distros.
 
 grade: stable
-confinement: strict
+confinement: classic
 base: core22
 
 architectures:

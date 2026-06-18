@@ -32,7 +32,14 @@ fn main() -> iced::Result {
         .unwrap_or("en");
     rust_i18n::set_locale(locale);
 
+    // Optional file path passed as first CLI argument: `tincta path/to/file`
+    let file_arg = std::env::args()
+        .nth(1)
+        .filter(|a| !a.starts_with('-'))
+        .map(std::path::PathBuf::from);
+
     app::TinctaApp::run(Settings {
+        flags: file_arg,
         window: window::Settings {
             size: Size::new(1200.0, 800.0),
             min_size: Some(Size::new(600.0, 400.0)),

@@ -65,11 +65,14 @@ impl SidebarState {
             SidebarMessage::RemoveFile(idx) => {
                 if idx < self.files.len() {
                     let path = self.files.remove(idx);
-                    let was_selected = self.selected == Some(idx);
-                    self.selected = None;
-                    if was_selected {
-                        return SidebarAction::CloseFile(path);
-                    }
+                    // Adjust or clear selected index
+                    self.selected = match self.selected {
+                        Some(sel) if sel == idx => None,
+                        Some(sel) if sel > idx => Some(sel - 1),
+                        other => other,
+                    };
+                    // Always propagate so app can update file_cache and save session
+                    return SidebarAction::CloseFile(path);
                 }
                 SidebarAction::None
             }

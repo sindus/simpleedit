@@ -130,9 +130,9 @@ impl Application for TinctaApp {
     type Executor = executor::Default;
     type Message = Message;
     type Theme = Theme;
-    type Flags = ();
+    type Flags = Option<PathBuf>;
 
-    fn new(_flags: ()) -> (Self, Command<Message>) {
+    fn new(flags: Self::Flags) -> (Self, Command<Message>) {
         let config = Config::load();
         let session = crate::session::Session::load();
 
@@ -163,7 +163,14 @@ impl Application for TinctaApp {
         };
 
         app.restore_session(session);
-        (app, Command::none())
+
+        // If a file path was given on the command line, open it on top of the session
+        let cmd = if let Some(path) = flags {
+            Command::perform(read_file(path), Message::FileOpened)
+        } else {
+            Command::none()
+        };
+        (app, cmd)
     }
 
     fn title(&self) -> String {
