@@ -90,6 +90,7 @@ jobs:
         id: build-snap
         with:
           snapcraft-args: --destructive-mode
+          snapcraft-channel: 8.x/stable
       - uses: snapcore/action-publish@v1
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
