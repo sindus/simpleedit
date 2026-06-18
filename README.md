@@ -17,11 +17,23 @@ A fast, stable, cross-platform text editor for **macOS** and **Linux**, inspired
 - **Dark / Light theme**
 - **Internationalisation** — English and French
 - Configurable: font size, tab width, word wrap, auto-indent, bracket/quote completion
+- Line editing: duplicate, move, comment/uncomment, indent/dedent
+- Code formatting via external tools (prettier, rustfmt, …)
 - Native binaries — macOS (Apple Silicon) and Linux (x86_64)
 
 ---
 
 ## Installation
+
+### One-liner (Linux & macOS)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sindus/tincta-V2/main/install.sh | bash
+```
+
+Detects your OS automatically, downloads the latest release, and installs it.
+
+---
 
 ### macOS — Homebrew
 
@@ -30,22 +42,68 @@ brew tap sindus/tincta
 brew install tincta-v2
 ```
 
+**Uninstall:**
+```bash
+brew uninstall tincta-v2
+```
+
+---
+
 ### Ubuntu / Debian — .deb
 
+Download and install the latest `.deb` package:
+
 ```bash
-wget https://github.com/sindus/tincta-V2/releases/latest/download/tincta_0.5.1-1_amd64.deb
-sudo dpkg -i tincta_0.5.1-1_amd64.deb
+curl -fsSL https://api.github.com/repos/sindus/tincta-V2/releases/latest \
+  | grep '"browser_download_url"' | grep '\.deb' \
+  | cut -d '"' -f 4 | xargs wget -q -O tincta.deb
+sudo dpkg -i tincta.deb && rm tincta.deb
 ```
+
+Or grab the file directly from the [Releases page](https://github.com/sindus/tincta-V2/releases/latest).
+
+**Uninstall:**
+```bash
+sudo apt remove tincta
+# or
+sudo dpkg -r tincta
+```
+
+---
+
+### Linux — tar.gz (any distro)
+
+```bash
+VERSION=$(curl -fsSL https://api.github.com/repos/sindus/tincta-V2/releases/latest | grep '"tag_name"' | head -1 | sed 's/.*"\(.*\)".*/\1/')
+curl -fsSL "https://github.com/sindus/tincta-V2/releases/download/${VERSION}/tincta-${VERSION}-x86_64-linux.tar.gz" | tar xz
+sudo mv tincta /usr/local/bin/
+```
+
+**Uninstall:**
+```bash
+sudo rm /usr/local/bin/tincta
+```
+
+---
 
 ### Build from source
 
 ```bash
-# Prerequisites (Ubuntu)
+# Prerequisites (Ubuntu/Debian)
 sudo apt-get install libgtk-3-dev libxkbcommon-dev
 
-# Build
+# Build & run
 cargo build --release
 ./target/release/tincta
+```
+
+---
+
+## Usage
+
+```bash
+tincta                  # open with last session
+tincta path/to/file     # open a specific file
 ```
 
 ---
@@ -53,17 +111,10 @@ cargo build --release
 ## Development
 
 ```bash
-# Run
-cargo run
-
-# Lint
-cargo clippy -- -D warnings
-
-# Format
-cargo fmt
-
-# Tests
-cargo test
+cargo run           # run in dev mode
+cargo test          # run tests
+cargo clippy        # lint
+cargo fmt           # format source
 ```
 
 ---
