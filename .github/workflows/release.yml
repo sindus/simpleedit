@@ -11,18 +11,13 @@ env:
 
 jobs:
   build-macos:
-    name: Build macOS (${{ matrix.target }})
+    name: Build macOS (Apple Silicon)
     runs-on: macos-latest
-    strategy:
-      matrix:
-        target:
-          - x86_64-apple-darwin
-          - aarch64-apple-darwin
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: aarch64-apple-darwin
       - uses: actions/cache@v4
         with:
           path: |
@@ -31,17 +26,17 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-${{ matrix.target }}-release-${{ hashFiles('**/Cargo.lock') }}
+          key: macos-aarch64-release-${{ hashFiles('**/Cargo.lock') }}
       - name: Build
-        run: cargo build --release --target ${{ matrix.target }}
+        run: cargo build --release --target aarch64-apple-darwin
       - name: Package
         run: |
-          cd target/${{ matrix.target }}/release
-          tar czf tincta-${{ github.ref_name }}-${{ matrix.target }}.tar.gz ${{ env.BINARY_NAME }}
+          cd target/aarch64-apple-darwin/release
+          tar czf tincta-${{ github.ref_name }}-aarch64-apple-darwin.tar.gz ${{ env.BINARY_NAME }}
           mv tincta-*.tar.gz ${{ github.workspace }}/
       - uses: actions/upload-artifact@v4
         with:
-          name: tincta-${{ matrix.target }}
+          name: tincta-macos-aarch64
           path: tincta-*.tar.gz
 
   build-linux:

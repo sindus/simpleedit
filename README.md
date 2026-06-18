@@ -17,7 +17,7 @@ A fast, stable, cross-platform text editor for **macOS** and **Linux**, inspired
 - **Dark / Light theme**
 - **Internationalisation** — English and French
 - Configurable: font size, tab width, word wrap, auto-indent, bracket/quote completion
-- Native binaries — macOS (Intel + Apple Silicon) and Linux (x86_64)
+- Native binaries — macOS (Apple Silicon) and Linux (x86_64)
 
 ---
 
@@ -33,8 +33,8 @@ brew install tincta-v2
 ### Ubuntu / Debian — .deb
 
 ```bash
-wget https://github.com/sindus/tincta-V2/releases/latest/download/tincta.deb
-sudo dpkg -i tincta.deb
+wget https://github.com/sindus/tincta-V2/releases/latest/download/tincta_0.4.0_amd64.deb
+sudo dpkg -i tincta_0.4.0_amd64.deb
 ```
 
 ### Linux — Snap
