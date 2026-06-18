@@ -80,6 +80,8 @@ pub enum Message {
     SetLanguage(String),
     OpenShortcuts,
     StartCaptureShortcut(ShortcutTarget),
+    // Deferred cursor move after autocomplete pair insertion (layout must run first to shape buffer)
+    MoveCursorLeft,
 }
 
 pub struct TinctaApp {
@@ -210,11 +212,10 @@ impl Application for TinctaApp {
                             self.editor.content.perform(text_editor::Action::Edit(
                                 text_editor::Edit::Insert(close),
                             ));
-                            self.editor.content.perform(text_editor::Action::Move(
-                                text_editor::Motion::Left,
-                            ));
                             self.is_dirty = true;
-                            return Command::none();
+                            // Motion::Left is a no-op on unshaped lines (cosmic_text bug).
+                            // Defer to the next update cycle so layout() shapes the buffer first.
+                            return Command::perform(async {}, |_| Message::MoveCursorLeft);
                         }
                     }
                 }
@@ -228,11 +229,8 @@ impl Application for TinctaApp {
                             self.editor.content.perform(text_editor::Action::Edit(
                                 text_editor::Edit::Insert(c),
                             ));
-                            self.editor.content.perform(text_editor::Action::Move(
-                                text_editor::Motion::Left,
-                            ));
                             self.is_dirty = true;
-                            return Command::none();
+                            return Command::perform(async {}, |_| Message::MoveCursorLeft);
                         }
                     }
                 }
@@ -575,6 +573,12 @@ impl Application for TinctaApp {
             }
             Message::AutoSave => {
                 self.save_session();
+                Command::none()
+            }
+            Message::MoveCursorLeft => {
+                self.editor.content.perform(text_editor::Action::Move(
+                    text_editor::Motion::Left,
+                ));
                 Command::none()
             }
             // --- Overlays ---
