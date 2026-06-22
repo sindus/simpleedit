@@ -173,7 +173,7 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            dark_mode: false,
+            dark_mode: true,
             font_size: 14.0,
             font_family: "Monospace".to_string(),
             tab_width: 4,
@@ -193,16 +193,51 @@ impl Default for Config {
     }
 }
 
+fn detect_system_dark_mode() -> bool {
+    #[cfg(target_os = "linux")]
+    {
+        if let Ok(out) = std::process::Command::new("gsettings")
+            .args(["get", "org.gnome.desktop.interface", "color-scheme"])
+            .output()
+        {
+            let s = String::from_utf8_lossy(&out.stdout);
+            if s.contains("prefer-light") {
+                return false;
+            }
+        }
+    }
+    #[cfg(target_os = "macos")]
+    {
+        if let Ok(out) = std::process::Command::new("defaults")
+            .args(["read", "-g", "AppleInterfaceStyle"])
+            .output()
+        {
+            let s = String::from_utf8_lossy(&out.stdout);
+            if !s.trim().eq_ignore_ascii_case("dark") {
+                return false;
+            }
+        }
+    }
+    true
+}
+
 impl Config {
     pub fn config_path() -> Option<PathBuf> {
         dirs::config_dir().map(|d| d.join("simpleedit").join("config.json"))
     }
 
     pub fn load() -> Self {
-        Self::config_path()
-            .and_then(|p| std::fs::read_to_string(p).ok())
-            .and_then(|s| serde_json::from_str(&s).ok())
-            .unwrap_or_default()
+        if let Some(path) = Self::config_path() {
+            if let Ok(s) = std::fs::read_to_string(&path) {
+                if let Ok(cfg) = serde_json::from_str(&s) {
+                    return cfg;
+                }
+            }
+        }
+        Config {
+            dark_mode: detect_system_dark_mode(),
+            ..Default::default()
+        }
     }
 
     pub fn save(&self) {
