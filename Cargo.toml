@@ -36,6 +36,7 @@ codegen-units = 1
 strip = true
 
 [package.metadata.deb]
+maintainer-scripts = "debian/"
 maintainer = "sindus"
 copyright = "2024, sindus"
 license-file = ["LICENSE", "0"]
