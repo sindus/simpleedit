@@ -126,7 +126,9 @@
       font-family: "SF Mono", "Consolas", monospace;
       color: var(--green);
       margin-bottom: 0.75rem;
-      white-space: pre;
+      white-space: pre-wrap;
+      word-break: break-all;
+      overflow-x: auto;
     }
     .platform-card .btn { width: 100%; justify-content: center; margin-top: 0.5rem; }
 
@@ -229,13 +231,12 @@
   <div class="platform-card">
     <h3>&#127822; macOS</h3>
     <div lang-content="en" class="active">
-      <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:.75rem">Install via Homebrew:</p>
+      <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:.75rem">One-liner install:</p>
     </div>
     <div lang-content="fr">
-      <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:.75rem">Installation via Homebrew :</p>
+      <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:.75rem">Installation en une ligne :</p>
     </div>
-    <code>brew tap simpleeditdev/simpleedit
-brew install simpleedit</code>
+    <code>curl -fsSL https://raw.githubusercontent.com/simpleeditdev/simpleedit/main/install.sh | bash</code>
     <div lang-content="en" class="active">
       <p style="color:var(--text-dim);font-size:.83rem">Or download the binary directly:</p>
     </div>
@@ -257,9 +258,7 @@ brew install simpleedit</code>
     <div lang-content="fr">
       <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:.75rem">Installer le paquet .deb :</p>
     </div>
-    <code>wget https://github.com/simpleeditdev/simpleedit/
-  releases/latest/download/simpleedit.deb
-sudo dpkg -i simpleedit.deb</code>
+    <code>curl -fsSL https://raw.githubusercontent.com/simpleeditdev/simpleedit/main/install.sh | bash</code>
     <a class="btn btn-secondary" href="https://github.com/simpleeditdev/simpleedit/releases/latest">
       <span class="lang-inline active" data-lang="en">Download .deb</span>
       <span class="lang-inline" data-lang="fr">T&eacute;l&eacute;charger .deb</span>
