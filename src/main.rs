@@ -39,13 +39,15 @@ fn main() -> iced::Result {
         .map(std::path::PathBuf::from);
 
     app::SimpleEditApp::run(Settings {
-        id: Some("simpleedit".to_string()),
         flags: file_arg,
         window: window::Settings {
             size: Size::new(1200.0, 800.0),
             min_size: Some(Size::new(600.0, 400.0)),
             resizable: true,
             icon: load_icon(),
+            platform_specific: window::settings::PlatformSpecific {
+                application_id: "simpleedit".to_string(),
+            },
             ..Default::default()
         },
         ..Default::default()
